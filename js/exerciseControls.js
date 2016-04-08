@@ -1,6 +1,3 @@
-
-
-
 //########################## functions for useability of image control buttons on exercise page###########################################
 
 //functionality of next level button--shows pop up if user aleady at last level.
@@ -135,6 +132,24 @@ function indicateLevel (){
     imageIndicator.textContent = userInfo.lastImageIndex+1;
 }
 
+function panicShortcut(e) {   // handles space bar event handler.
+  if (e.keyCode == '32') {
+    showPanicImage();
+  }
+}
+
+
+function showBuffer() {
+    bufferDiv.style.display = 'block';
+}
+
+function removeBuffer() {
+    window.addEventListener('keydown', panicShortcut);    //spacebar event listener to show panic image
+    bufferDiv.className = 'reveal';
+    setTimeout(function() {
+        bufferDiv.style.display = 'none';
+    }, 2000);
+}
 
 
 var todaysHighestLevel = 1;
@@ -153,22 +168,25 @@ var panic          = gebi("panic");
 var questionForm   = gebi('questionForm');
 var exercisePage   = gebi('exercisePage');
 var locationDiv    = gebi('location');
+var bufferDiv      = gebi('buffer');
+var continueButton = gebi('continueButton');
+
+
+/*****************************
+    BEGINNING OF LOGIC
+****************************/
+
 
 if (!localStorage.userInfo) {
     showForm();
-    console.log(userInfo);
 } else {
     displayImage(userInfo.lastLevelIndex,userInfo.lastImageIndex);
     indicateLevel();
+    window.addEventListener('keydown', panicShortcut);    //spacebar event listener to show panic image
 }
 
-window.onbeforeunload = function () {
-    if (userInfo.evalComplete === true) {
-        userInfo.previousVisitLevels.push(todaysHighestLevel);
-        storeUserInfo();
-    }
-}
 
+continueButton.addEventListener("click", removeBuffer, false);
 panic.addEventListener("click", showPanicImage, false);
 nextLevel.addEventListener("click", goNextLevel ,false);
 help.addEventListener("click", showHelp, false);
@@ -178,9 +196,10 @@ lastLevel.addEventListener("click", goLastLevel ,false);
 //OK BUTTON ON FORM TO TRIGGER HIDE POPUP FUNCTION
 okButton.addEventListener("click", hidePopup, false);
 
-//spacebar event listener to show panic image
-window.addEventListener('keydown', function(e) {
-  if (e.keyCode == '32') {
-    showPanicImage();
-  }
-});
+//  To save data when user leaves the page.
+window.onbeforeunload = function () {
+    if (userInfo.evalComplete === true) {
+        userInfo.previousVisitLevels.push(todaysHighestLevel);
+        storeUserInfo();
+    }
+}
